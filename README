@@ -1,0 +1,5 @@
+Nagios plugin for monitoring the APC opcode cache for PHP.
+
+The apc.php status script (which ships with php-apc) must be installed on the system to be monitoried and made accessible via HTTP/HTTPS.
+
+

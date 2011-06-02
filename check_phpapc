@@ -1,0 +1,54 @@
+#!/usr/bin/php -q
+<?php
+
+# Nagios plugin for monitoring the APC opcode cache for PHP.
+# The apc.php status script (which ships with php-apc) must be installed on the system to be monitoried and made accessible via HTTP/HTTPS.
+# See: https://github.com/nmcclain/home/ned/check_phpapc
+
+$service_name = "PHP-APC";
+$wget_or_curl_command = "wget -O - -q ";
+$options = getopt("U:f:");
+
+if (isset($options["U"])) { 
+        $url = $options["U"];
+} else {
+        usage();
+}
+if (isset($options["f"])) { 
+        $free_pct_min = $options["f"];
+} else {
+        $free_pct_min = 5;
+}
+
+$cmd = $wget_or_curl_command.$url;
+$results = `$cmd`;
+
+if (preg_match_all('/Host Status Diagrams.*Free:\s+(\S+ \S+)\s+\((\S+)%\).*Hits:\s+(\S+)\s+\((\S+)%\).*Used:\s+(\S+ \S+)\s+\((\S+)%\).*Misses:\s+(\S+)\s+\((\S+)%\).*Detailed Memory Usage and Fragmentation/msU', $results, $matches)) {
+	$free = $matches[1][0];
+	$free_pct = $matches[2][0];
+	$hits = $matches[3][0];
+	$hits_pct = $matches[4][0];
+	$used = $matches[5][0];
+	$used_pct = $matches[6][0];
+	$used = $matches[7][0];
+	$used_pct = $matches[8][0];
+} else {
+	die('Could not parse apc.php output.');
+}
+
+if ($free_pct > $free_pct_min) {
+	echo $service_name." OK: ".$free_pct."% free mem\n";
+	echo "MIN: $free_pct_min \n";
+	$status=0;
+} else {
+	echo $service_name." CRITICAL: ".$free_pct."% free mem\n";
+	$status=1;
+} 
+
+exit($status);
+
+function usage() {
+	echo "Usage: check_phpapc -U <full URL to apc.php>";
+	echo "Usage example: check_phpapc -U http://admin.com/apc.php";
+	exit(1);
+}
