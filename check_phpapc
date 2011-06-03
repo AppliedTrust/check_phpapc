@@ -10,7 +10,7 @@ $service_name = "PHP-APC";
 $wget_or_curl_command = "wget -O - -q ";
 
 ## read arguments/set default thresholds
-$options = getopt("U:f:");
+$options = getopt("U:f:m:");
 if (isset($options["U"])) { 
         $url = $options["U"];
 } else {
