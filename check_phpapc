@@ -54,7 +54,7 @@ if (preg_match_all('/Host Status Diagrams.*Free:\s+(\S+\s\S+)\s+\((\S+)%\).*Hits
 	if ($frag_pct >= $frag_pct_max) {
 		if ($status < 2) { $status=1; }
 	} 
-	$perf = " |free=".$free.",free_pct=".$free_pct.",hits_pct=".$hits_pct.",miss_pct=".$miss_pct.",frag_pct=".$frag_pct;
+	$perf = " | free=".$free."; free_pct=".$free_pct."; hits_pct=".$hits_pct."; miss_pct=".$miss_pct."; frag_pct=".$frag_pct;
 } else {
 	$output[] = "Could not parse apc.php output";
 	$status=2;
