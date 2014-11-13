@@ -10,7 +10,7 @@ $service_name = "PHP-APC";
 $wget_or_curl_command = "wget -O - -q ";
 
 ## read arguments/set default thresholds
-$options = getopt("U:f:m:");
+$options = getopt("U:f:m:H:");
 if (isset($options["U"])) { 
         $url = $options["U"];
 } else {
@@ -25,6 +25,11 @@ if (isset($options["f"])) {
         $frag_pct_max = $options["f"];
 } else {
         $frag_pct_max = 5;
+}
+if (isset($options["H"])) { 
+        $hits_pct_min = $options["H"];
+} else {
+        $hits_pct_min = 80 ;
 }
 
 ## fetch APC stats from apc.php
@@ -46,6 +51,10 @@ if (preg_match_all('/Host Status Diagrams.*Free:\s+(\S+\s\S+)\s+\((\S+)%\).*Hits
 	$frag_pct = $matches[9][0];
 
 	## check APC stats against thresholds
+	$output[] = $hits_pct."% hits";
+	if ($hits_pct < $hits_pct_min) {
+		if ($status < 2) { $status=1; }
+	}
 	$output[] = $used_pct."% used mem";
 	if ($used_pct >= $used_pct_max) {
 		if ($status < 2) { $status=1; }
@@ -75,7 +84,7 @@ exit($status);
 
 #########
 function usage() {
-	echo "Usage: check_phpapc -U <full URL to apc.php> [-m <max_used_memory_pct>] [-f <max_fragmentation>]\n";
-	echo "Usage example: check_phpapc -U http://admin.com/apc.php -m 90 -f 10\n";
+	echo "Usage: check_phpapc -U <full URL to apc.php> [-m <max_used_memory_pct>] [-f <max_fragmentation>] [-H <min_hits_pct>]\n";
+	echo "Usage example: check_phpapc -U http://admin.com/apc.php -m 90 -f 10 -H 90\n";
 	exit(1);
 }
